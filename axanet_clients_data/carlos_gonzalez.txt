@@ -1,0 +1,7 @@
+Nombre: carlos gonzalez
+ID_Cliente: CG_20251026135917
+Telefono: 5532001055
+Correo: jcgonzalezcerqueda@gmail.com
+FechaRegistro: 2025-10-26
+Servicios:
+- laminado (2025-10-26 13:59:17)
