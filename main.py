@@ -1,26 +1,4 @@
 #!/usr/bin/env python3
-"""
-Sistema de Gestión de Clientes Axanet
-====================================
-
-Programa principal que permite gestionar los clientes de la empresa Axanet.
-Utiliza tablas hash (diccionarios de Python) para búsquedas eficientes.
-
-Funcionalidades:
-- Crear nuevos clientes con su primer servicio
-- Buscar clientes por nombre (búsqueda O(1) con tabla hash)
-- Listar todos los clientes registrados  
-- Agregar nuevos servicios a clientes existentes
-- Eliminar clientes del sistema
-
-Estructura de archivos:
-- Cada cliente se guarda en un archivo .txt individual
-- Los archivos se almacenan en la carpeta 'axanet_clients_data/'
-- Los nombres se normalizan para evitar problemas (ej: ana_garcia.txt)
-
-Autor: Estudiante
-Actividad: Práctica II - Sistemas de Información
-"""
 
 import sys
 import os
@@ -49,39 +27,9 @@ class AplicacionAxanet:
     """
     
     def __init__(self):
-        """
-        Inicializa la aplicación creando el gestor de clientes.
-        El gestor contiene la tabla hash (diccionario) principal.
-        """
-        print("🔄 Inicializando sistema Axanet...")
+
+        
         self.gestor_clientes = ClienteManager()
-        print("✅ Sistema listo para usar")
-        
-    def mostrar_bienvenida(self):
-        """Muestra el mensaje de bienvenida y información del sistema."""
-        print("\n" + "="*55)
-        print("🏢 SISTEMA DE GESTIÓN DE CLIENTES AXANET")
-        print("   Utilizando Tablas Hash para Búsquedas Rápidas")
-        print("="*55)
-        print("📚 CONCEPTOS DEMOSTRADOS:")
-        print("   • Tablas Hash (Diccionarios) - Búsqueda O(1)")
-        print("   • Gestión de Archivos de Texto")
-        print("   • Validación de Datos")
-        print("   • Manejo de Errores")
-        print("   • Programación Modular")
-        
-        # Mostrar estadísticas actuales si hay clientes
-        try:
-            estadisticas = self.gestor_clientes.obtener_estadisticas()
-            if estadisticas["total_clientes"] > 0:
-                print(f"\n📊 ESTADO ACTUAL:")
-                print(f"   • Clientes registrados: {estadisticas['total_clientes']}")
-                print(f"   • Servicios en total: {estadisticas['total_servicios']}")
-                print(f"   • Promedio servicios por cliente: {estadisticas['promedio_servicios']:.1f}")
-        except Exception:
-            print("\n📊 ESTADO: Sistema vacío - ¡Crea tu primer cliente!")
-            
-        print("="*55)
 
     def mostrar_menu(self):
         """Muestra las opciones disponibles en el menú principal."""
@@ -409,7 +357,7 @@ class AplicacionAxanet:
         - Procesa las opciones del usuario
         - Maneja errores de entrada
         """
-        self.mostrar_bienvenida()
+
         
         while True:
             try:
