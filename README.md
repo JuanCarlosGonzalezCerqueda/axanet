@@ -7,11 +7,7 @@
 
 **Sistema Académico de Gestión de Clientes - Versión Simplificada**
 
-Sistema de gestión de clientes desarrollado en Python para demostrar conceptos fundamentales de estructuras de datos y programación orientada a objetos. Implementa tablas hash para búsquedas eficientes O(1) y persistencia de datos mediante archivos de texto.
-
-## Objetivos Educativos
-
-Este proyecto está diseñado para estudiantes universitarios que desean aprender:
+Sistema de gestión de clientes
 
 ### Conceptos Fundamentales de Ciencias de la Computación
 - **Tablas Hash**: Rendimiento de búsqueda O(1) usando diccionarios de Python

@@ -10,7 +10,6 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 # Importar nuestros módulos personalizados
 from axanet.cliente_manager import ClienteManager
 from axanet.excepciones import (
-    ClienteError,
     ClienteNoEncontradoError, 
     ClienteExisteError,
     ErrorValidacion
@@ -18,69 +17,49 @@ from axanet.excepciones import (
 
 
 class AplicacionAxanet:
-    """
-    Clase principal de la aplicación Axanet.
-    
-    Esta clase maneja toda la interfaz de usuario y coordina las operaciones
-    con el gestor de clientes. Utiliza el patrón de menú interactivo para
-    que sea fácil de usar.
-    """
-    
     def __init__(self):
 
         
         self.gestor_clientes = ClienteManager()
 
     def mostrar_menu(self):
+        os.system('cls')
         """Muestra las opciones disponibles en el menú principal."""
-        print("\n📋 MENÚ PRINCIPAL")
+        print("\nMENÚ PRINCIPAL")
         print("─" * 35)
-        print("1. 📝 Crear nuevo cliente")
-        print("2. 🔍 Buscar cliente por nombre") 
-        print("3. 📊 Ver todos los clientes")
-        print("4. ➕ Agregar servicio a cliente")
-        print("5. 🗑️  Eliminar cliente")
-        print("6. 📈 Ver estadísticas del sistema")
-        print("7. 🎓 Demostrar tabla hash")
-        print("0. 🚪 Salir del programa")
+        print("1. Crear nuevo cliente")
+        print("2. Buscar cliente por nombre") 
+        print("3. Ver todos los clientes")
+        print("4. Agregar servicio a cliente")
+        print("5. Eliminar cliente")
+        print("0. Salir")
         print("─" * 35)
 
     def crear_cliente(self):
-        """
-        Crea un nuevo cliente solicitando los datos al usuario.
-        
-        Esta función demuestra:
-        - Validación de entrada de datos
-        - Manejo de excepciones
-        - Uso de la tabla hash para verificar existencia
-        """
-        print("\n📝 CREAR NUEVO CLIENTE")
+        print("\nCREAR NUEVO CLIENTE")
         print("─" * 25)
         
         try:
-            # Solicitar datos del cliente
-            nombre = input("👤 Nombre completo del cliente: ").strip()
+            nombre = input("Nombre completo del cliente: ").strip()
             if not nombre:
-                print("❌ El nombre no puede estar vacío")
+                print("Campo obligatorio")
                 return
                 
-            telefono = input("📞 Teléfono (10 dígitos): ").strip()
+            telefono = input("Teléfono (10 dígitos): ").strip()
             if not telefono:
-                print("❌ El teléfono no puede estar vacío")
+                print("Campo obligatorio")
                 return
                 
-            email = input("📧 Correo electrónico: ").strip()
+            email = input("Correo electrónico: ").strip()
             if not email:
-                print("❌ El correo no puede estar vacío")
+                print("Campo obligatorio")
                 return
                 
-            primer_servicio = input("🔧 Descripción del primer servicio: ").strip()
+            primer_servicio = input("Descripción del primer servicio: ").strip()
             if not primer_servicio:
-                print("❌ Debe proporcionar una descripción del servicio")
+                print("Campo obligatorio")
                 return
-            
-            # Intentar crear el cliente usando el gestor
-            print("\n⏳ Creando cliente...")
+
             cliente = self.gestor_clientes.crear_cliente(
                 nombre=nombre,
                 telefono=telefono, 
@@ -88,334 +67,210 @@ class AplicacionAxanet:
                 primer_servicio=primer_servicio
             )
             
-            print(f"✅ Cliente creado exitosamente!")
-            print(f"📄 Archivo: axanet_clients_data/{cliente.nombre_normalizado}.txt")
-            print(f"🆔 ID generado: {cliente.id_cliente}")
+            print(f"Cliente creado exitosamente!")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
             
         except ClienteExisteError as e:
-            print(f"❌ Error: {e}")
+            print(f"Cliente ya esta en la base")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
         except ErrorValidacion as e:
             print(f"❌ Error de validación: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
         except Exception as e:
             print(f"❌ Error inesperado: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
 
     def buscar_cliente(self):
-        """
-        Busca un cliente por nombre utilizando la tabla hash.
-        
-        Esta función demuestra:
-        - Búsqueda O(1) en tabla hash
-        - Manejo de casos cuando no se encuentra el elemento
-        - Presentación de información de manera clara
-        """
-        print("\n🔍 BUSCAR CLIENTE")
+        print("\nBUSCAR CLIENTE")
         print("─" * 17)
         
-        nombre = input("👤 Ingrese el nombre del cliente: ").strip()
+        nombre = input("Ingrese el nombre del cliente: ").strip()
         if not nombre:
-            print("❌ Debe ingresar un nombre")
+            print("campo obligatorio")
             return
             
         try:
-            print("⏳ Buscando en tabla hash...")
-            
-            # Esta búsqueda es O(1) gracias a la tabla hash
             cliente = self.gestor_clientes.obtener_cliente(nombre)
-            
-            print("✅ Cliente encontrado:")
-            print("─" * 25)
-            print(f"👤 Nombre: {cliente.nombre}")
-            print(f"🆔 ID: {cliente.id_cliente}")
-            print(f"📞 Teléfono: {cliente.telefono}")
-            print(f"📧 Email: {cliente.email}")
-            print(f"📅 Registrado: {cliente.fecha_registro}")
-            print(f"\n🔧 SERVICIOS ({len(cliente.servicios)}):")
+            print("Cliente encontrado:")
+            print(f"Nombre: {cliente.nombre}")
+            print(f"ID: {cliente.id_cliente}")
+            print(f"Teléfono: {cliente.telefono}")
+            print(f"Email: {cliente.email}")
+            print(f"Registrado: {cliente.fecha_registro}")
+            print(f"\nSERVICIOS ({len(cliente.servicios)}):")
             
             for i, servicio in enumerate(cliente.servicios, 1):
                 print(f"   {i}. {servicio.descripcion}")
-                print(f"      📅 Fecha: {servicio.fecha_solicitud}")
+                print(f"      Fecha: {servicio.fecha_solicitud}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
                 
         except ClienteNoEncontradoError:
-            print(f"❌ No se encontró un cliente con el nombre '{nombre}'")
-            print("💡 Verifique la ortografía o use la opción 3 para ver todos los clientes")
+            print(f"No se encontró un cliente con el nombre '{nombre}'")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
         except Exception as e:
-            print(f"❌ Error al buscar: {e}")
+            print(f"Error al buscar: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
 
     def listar_todos_clientes(self):
-        """
-        Lista todos los clientes cargando los archivos a la tabla hash.
-        
-        Esta función demuestra:
-        - Carga de todos los elementos en la tabla hash
-        - Iteración sobre diccionarios
-        - Presentación tabular de información
-        """
-        print("\n📊 TODOS LOS CLIENTES")
+        print("\nTODOS LOS CLIENTES")
         print("─" * 21)
         
         try:
-            print("⏳ Cargando todos los clientes en tabla hash...")
             clientes = self.gestor_clientes.listar_todos_clientes()
             
             if not clientes:
-                print("📭 No hay clientes registrados en el sistema")
-                print("💡 Use la opción 1 para crear el primer cliente")
+                print("No hay clientes registrados en el sistema")
+                input("Presiona Enter para continuar...")
+                os.system('cls')
                 return
             
-            print(f"✅ Se encontraron {len(clientes)} cliente(s):\n")
-            
-            # Mostrar tabla de clientes
-            print(f"{'#':<3} {'NOMBRE':<25} {'TELÉFONO':<12} {'SERVICIOS':<10}")
-            print("─" * 55)
+            print(f"Se encontraron {len(clientes)} cliente(s):\n")
             
             for i, cliente in enumerate(clientes, 1):
                 nombre_corto = cliente.nombre[:22] + "..." if len(cliente.nombre) > 25 else cliente.nombre
                 print(f"{i:<3} {nombre_corto:<25} {cliente.telefono:<12} {len(cliente.servicios):<10}")
                 
             print("─" * 55)
-            print(f"Total: {len(clientes)} cliente(s) en la tabla hash")
+            print(f"Total: {len(clientes)} cliente(s)")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
             
         except Exception as e:
-            print(f"❌ Error al listar clientes: {e}")
+            print(f"Error al listar clientes: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
 
     def agregar_servicio(self):
-        """
-        Agrega un servicio a un cliente existente.
-        
-        Esta función demuestra:
-        - Búsqueda en tabla hash para encontrar cliente
-        - Modificación de datos existentes
-        - Actualización de archivos
-        """
-        print("\n➕ AGREGAR SERVICIO A CLIENTE")
+        print("\nAGREGAR SERVICIO A CLIENTE")
         print("─" * 29)
         
-        nombre = input("👤 Nombre del cliente: ").strip()
+        nombre = input("Nombre del cliente: ").strip()
         if not nombre:
-            print("❌ Debe ingresar un nombre")
+            print("Campo obligatorio")
             return
-            
         try:
-            # Primero verificar que el cliente existe (búsqueda O(1))
             cliente = self.gestor_clientes.obtener_cliente(nombre)
-            print(f"✅ Cliente encontrado: {cliente.nombre}")
-            print(f"📋 Servicios actuales: {len(cliente.servicios)}")
-            
-            # Solicitar descripción del nuevo servicio
-            nuevo_servicio = input("🔧 Descripción del nuevo servicio: ").strip()
+            print(f"Cliente encontrado: {cliente.nombre}")
+            print(f"Servicios actuales: {len(cliente.servicios)}")
+            nuevo_servicio = input("Descripción del nuevo servicio: ").strip()
             if not nuevo_servicio:
-                print("❌ La descripción del servicio no puede estar vacía")
+                print("Campo obligatorio")
                 return
                 
-            # Agregar el servicio
-            print("⏳ Agregando servicio...")
+            print("Agregando servicio...")
             cliente_actualizado = self.gestor_clientes.agregar_servicio_cliente(
                 nombre, nuevo_servicio
             )
             
-            print("✅ Servicio agregado exitosamente!")
-            print(f"📋 Total de servicios: {len(cliente_actualizado.servicios)}")
+            print("Servicio agregado exitosamente!")
+            print(f"Total de servicios: {len(cliente_actualizado.servicios)}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
+            
             
         except ClienteNoEncontradoError:
-            print(f"❌ No se encontró un cliente con el nombre '{nombre}'")
+            print(f"No se encontró un cliente con el nombre '{nombre}'")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
         except Exception as e:
-            print(f"❌ Error al agregar servicio: {e}")
+            print(f"Error al agregar servicio: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
 
     def eliminar_cliente(self):
-        """
-        Elimina un cliente del sistema con confirmación.
-        
-        Esta función demuestra:
-        - Búsqueda en tabla hash
-        - Confirmación de usuario para operaciones destructivas
-        - Eliminación de archivos y datos de memoria
-        """
-        print("\n🗑️  ELIMINAR CLIENTE")
+        print("\nELIMINAR CLIENTE")
         print("─" * 18)
-        
-        nombre = input("👤 Nombre del cliente a eliminar: ").strip()
+        nombre = input("Nombre del cliente a eliminar: ").strip()
         if not nombre:
-            print("❌ Debe ingresar un nombre")
+            print("Campo obligatorio")
             return
             
         try:
-            # Verificar que el cliente existe
             cliente = self.gestor_clientes.obtener_cliente(nombre)
-            
-            # Mostrar información del cliente antes de eliminar
-            print(f"\n⚠️  ATENCIÓN: Se eliminará el siguiente cliente:")
-            print(f"👤 Nombre: {cliente.nombre}")
-            print(f"📞 Teléfono: {cliente.telefono}")
-            print(f"🔧 Servicios: {len(cliente.servicios)}")
-            
-            # Pedir confirmación
-            confirmacion = input("\n❓ ¿Está seguro? (escriba 'SI' para confirmar): ").strip().upper()
+            print(f"\n  ATENCIÓN: Se eliminará el siguiente cliente:")
+            print(f" Nombre: {cliente.nombre}")
+            print(f" Teléfono: {cliente.telefono}")
+            print(f" Servicios: {len(cliente.servicios)}")
+            confirmacion = input("\n¿Está seguro? (escriba 'SI' para confirmar): ").strip().upper()
             
             if confirmacion == "SI":
-                print("⏳ Eliminando cliente...")
+                print(" Eliminando cliente...")
                 exito = self.gestor_clientes.eliminar_cliente(nombre)
                 
                 if exito:
-                    print("✅ Cliente eliminado exitosamente")
-                    print("🗑️  Archivo borrado del disco")
-                    print("📝 Cliente removido de la tabla hash")
+                    print("Cliente eliminado exitosamente")
+                    input("Presiona Enter para continuar...")
+                    os.system('cls')
                 else:
-                    print("❌ No se pudo eliminar el cliente")
+                    print("No se pudo eliminar el cliente")
+                    input("Presiona Enter para continuar...")
+                    os.system('cls')
             else:
-                print("⏸️  Operación cancelada")
+                print("Operación cancelada")
+                input("Presiona Enter para continuar...")
+                os.system('cls')
                 
         except ClienteNoEncontradoError:
-            print(f"❌ No se encontró un cliente con el nombre '{nombre}'")
+            print(f" No se encontró un cliente con el nombre '{nombre}'")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
         except Exception as e:
-            print(f"❌ Error al eliminar: {e}")
-
-    def mostrar_estadisticas(self):
-        """
-        Muestra estadísticas del sistema y del rendimiento de la tabla hash.
-        
-        Esta función demuestra:
-        - Análisis de datos almacenados
-        - Cálculos estadísticos básicos
-        - Información sobre el rendimiento de la tabla hash
-        """
-        print("\n📈 ESTADÍSTICAS DEL SISTEMA")
-        print("─" * 27)
-        
-        try:
-            estadisticas = self.gestor_clientes.obtener_estadisticas()
-            
-            print("📊 DATOS GENERALES:")
-            print(f"   • Total de clientes: {estadisticas['total_clientes']}")
-            print(f"   • Total de servicios: {estadisticas['total_servicios']}")
-            print(f"   • Promedio servicios/cliente: {estadisticas['promedio_servicios']:.2f}")
-            
-            if estadisticas['total_clientes'] > 0:
-                print("\n💾 INFORMACIÓN DE ALMACENAMIENTO:")
-                print(f"   • Archivos en disco: {estadisticas['total_clientes']}")
-                print(f"   • Clientes en tabla hash: {len(self.gestor_clientes._cache_clientes)}")
-                print(f"   • Directorio: axanet_clients_data/")
-                
-                print("\n⚡ RENDIMIENTO DE TABLA HASH:")
-                print(f"   • Tiempo de búsqueda: O(1) constante")
-                print(f"   • Colisiones: 0 (nombres únicos)")
-                print(f"   • Factor de carga: {len(self.gestor_clientes._cache_clientes)} elementos")
-                
-        except Exception as e:
-            print(f"❌ Error al obtener estadísticas: {e}")
-
-    def demostrar_tabla_hash(self):
-        """
-        Modo educativo que demuestra cómo funciona la tabla hash.
-        
-        Esta función es puramente educativa y muestra:
-        - La estructura interna del diccionario
-        - Cómo se normalizan las claves
-        - El proceso de búsqueda O(1)
-        """
-        print("\n🎓 DEMOSTRACIÓN DE TABLA HASH")
-        print("─" * 29)
-        print("📚 Esta demostración muestra cómo funciona internamente")
-        print("   la tabla hash (diccionario) que usamos para los clientes.")
-        
-        try:
-            # Cargar todos los clientes si no están en caché
-            self.gestor_clientes._cargar_todos_clientes_a_cache()
-            cache = self.gestor_clientes._cache_clientes
-            
-            if not cache:
-                print("\n📭 La tabla hash está vacía")
-                print("💡 Cree algunos clientes primero para ver la demostración")
-                return
-            
-            print(f"\n🔧 ESTRUCTURA INTERNA DE LA TABLA HASH:")
-            print(f"   • Tipo: dict (diccionario de Python)")
-            print(f"   • Elementos: {len(cache)}")
-            print(f"   • Complejidad de búsqueda: O(1)")
-            
-            print(f"\n🗝️  CLAVES EN LA TABLA HASH:")
-            for i, (clave, cliente) in enumerate(cache.items(), 1):
-                print(f"   {i}. '{clave}' → {cliente.nombre}")
-                
-            # Demostración de búsqueda
-            print(f"\n🔍 DEMOSTRACIÓN DE BÚSQUEDA O(1):")
-            if cache:
-                primera_clave = list(cache.keys())[0]
-                print(f"   • Buscando clave: '{primera_clave}'")
-                print(f"   • Resultado: cache['{primera_clave}'] = {cache[primera_clave].nombre}")
-                print(f"   • Tiempo: O(1) - ¡Inmediato sin importar cuántos clientes hay!")
-                
-        except Exception as e:
-            print(f"❌ Error en la demostración: {e}")
+            print(f" Error al eliminar: {e}")
+            input("Presiona Enter para continuar...")
+            os.system('cls')
 
     def ejecutar(self):
-        """
-        Método principal que ejecuta el bucle de la aplicación.
-        
-        Este es el corazón de la aplicación que:
-        - Muestra la bienvenida
-        - Presenta el menú en bucle
-        - Procesa las opciones del usuario
-        - Maneja errores de entrada
-        """
-
-        
         while True:
             try:
                 self.mostrar_menu()
-                opcion = input("\n🎯 Seleccione una opción (0-7): ").strip()
+                opcion = input("\n Seleccione una opción (0-5): ").strip()
                 
                 if opcion == "0":
-                    print("\n👋 ¡Gracias por usar el Sistema Axanet!")
-                    print("🎓 Esperamos que haya aprendido sobre tablas hash")
+                    os.system('cls')
                     break
                 elif opcion == "1":
+                    os.system('cls')
                     self.crear_cliente()
                 elif opcion == "2":
+                    os.system('cls')
                     self.buscar_cliente()
+                    os.system('cls')
                 elif opcion == "3":
+                    os.system('cls')
                     self.listar_todos_clientes()
                 elif opcion == "4":
+                    os.system('cls')
                     self.agregar_servicio()
                 elif opcion == "5":
+                    os.system('cls')
                     self.eliminar_cliente()
-                elif opcion == "6":
-                    self.mostrar_estadisticas()
-                elif opcion == "7":
-                    self.demostrar_tabla_hash()
                 else:
-                    print("❌ Opción no válida. Por favor seleccione 0-7.")
-                    
-                # Pausa para que el usuario pueda leer el resultado
-                if opcion != "0":
-                    input("\n⏸️  Presione Enter para continuar...")
+                    print("Seleccion invalida, intente de nuevo")
                     
             except KeyboardInterrupt:
                 print("\n\n👋 Programa interrumpido por el usuario")
                 break
             except Exception as e:
-                print(f"\n❌ Error inesperado: {e}")
+                print(f"\n Error inesperado: {e}")
                 print("💡 Intente nuevamente o contacte al soporte técnico")
 
 
 def main():
-    """
-    Función principal que inicia la aplicación.
-    
-    Esta función:
-    - Crea la instancia de la aplicación
-    - Maneja errores de inicialización
-    - Proporciona un punto de entrada limpio
-    """
+
     try:
-        print("🚀 Iniciando Sistema de Gestión de Clientes Axanet...")
         aplicacion = AplicacionAxanet()
         aplicacion.ejecutar()
         
     except KeyboardInterrupt:
         print("\n\n👋 Programa interrumpido")
     except Exception as e:
-        print(f"\n💥 Error crítico al iniciar la aplicación: {e}")
-        print("🔧 Verifique que todos los archivos estén en su lugar")
         sys.exit(1)
 
 

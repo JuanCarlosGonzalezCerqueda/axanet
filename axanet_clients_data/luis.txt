@@ -1,0 +1,8 @@
+Nombre: luis
+ID_Cliente: LL_20251029235143
+Telefono: 9999999999
+Correo: luis@hot.com
+FechaRegistro: 2025-10-29
+Servicios:
+- caminar (2025-10-29 23:51:43)
+- yes (2025-10-30 00:10:58)

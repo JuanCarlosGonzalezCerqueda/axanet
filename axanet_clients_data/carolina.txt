@@ -1,0 +1,8 @@
+Nombre: carolina
+ID_Cliente: CC_20251029235022
+Telefono: 4444444444
+Correo: caro@gmail.com
+FechaRegistro: 2025-10-29
+Servicios:
+- llavar (2025-10-29 23:50:22)
+- poner repisa (2025-10-30 00:26:49)
