@@ -1,0 +1,36 @@
+name: Feature Request Notification
+on:
+  workflow_dispatch:
+    inputs:
+      request_title:
+        description: 'Title of the feature request'
+        required: false
+        default: 'Add import/export of clients'
+        type: string
+  issues:
+    types: [opened, labeled]
+jobs:
+  notify-team:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Team of Feature Request
+        run: |
+          REQUEST_TITLE="${{ github.event.inputs.request_title }}"
+          if [ -z "$REQUEST_TITLE" ]; then
+            REQUEST_TITLE="${{ github.event.issue.title }}"
+          fi
+          LABEL_NAME="${{ github.event.label.name }}"
+          if [ -n "$LABEL_NAME" ]; then
+            if [ "$LABEL_NAME" != "feature" ] && [ "$LABEL_NAME" != "feature-request" ]; then
+              echo "Triggered by label '$LABEL_NAME' (not a feature label), skipping notification."
+              exit 0
+            fi
+          fi
+          if [ -z "$REQUEST_TITLE" ]; then
+            REQUEST_TITLE="Unknown Feature Request"
+          fi
+          REQUEST_TITLE="${REQUEST_TITLE//_/ }"
+          echo "FEATURE REQUEST: $REQUEST_TITLE"
+          echo "Notifying team: ${{ github.actor }}, user1_github, user2_github"
+          echo "Timestamp: $(date)"
+          echo "Feature request received successfully!"

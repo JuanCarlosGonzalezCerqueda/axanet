@@ -4,17 +4,29 @@ on:
     inputs:
       client_name:
         description: 'Name of the new client'
-        required: true
+        required: false
         default: 'Juan Perez'
         type: string
 
+  push:
+    paths:
+      - 'axanet_clients_data/**'
 jobs:
   notify-team:
     runs-on: ubuntu-latest
     steps:
       - name: Notify Team of New Client
         run: |
-          echo NEW CLIENT CREATED: ${{ github.event.inputs.client_name }},
-          echo Notifying team: ${{ github.actor }}, user1_github, user2_github,
-          echo Timestamp: $(date)
-
+          CLIENT_NAME="${{ github.event.inputs.client_name }}"
+          if [ -z "$CLIENT_NAME" ]; then
+            CLIENT_NAME="${{ github.event.head_commit.added[0] }}"
+          fi
+          if [ -z "$CLIENT_NAME" ]; then
+            CLIENT_NAME="Unknown_Client"
+          fi
+          CLIENT_NAME=$(basename "$CLIENT_NAME" .txt)
+          CLIENT_NAME="${CLIENT_NAME//_/ }"
+          echo "NEW CLIENT CREATED: $CLIENT_NAME"
+          echo "Notifying team: ${{ github.actor }}, user1_github, user2_github"
+          echo "Timestamp: $(date)"
+          echo "Notification sent successfully!"
