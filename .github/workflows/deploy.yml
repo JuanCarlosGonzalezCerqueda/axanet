@@ -1,24 +1,13 @@
-# ========================================================================
-# WORKFLOW: DEPLOY TO EC2 - CI/CD Pipeline
-# ========================================================================
-#
-# 📋 PROPÓSITO: Construcción de imagen Docker y despliegue automático a EC2
-# 🎯 FLUJO: Build & Push → Deploy to EC2 usando SSH
-
-name: "🚀 Deploy to EC2 - CI/CD Pipeline"
-
+name: "🚀 Deploy to EC2"
 on:
-  # TRIGGER: Push a rama main
   push:
     branches: 
       - main
     paths:
-      - '**.py'
+      - '**/*.py'
       - 'Dockerfile'
       - 'requirements.txt'
       - 'src/**'
-
-  # TRIGGER MANUAL para testing
   workflow_dispatch:
     inputs:
       reason:
@@ -26,30 +15,22 @@ on:
         required: false
         default: 'Despliegue manual'
         type: string
-
 jobs:
-  # ================================
-  # JOB 1: BUILD AND PUSH
-  # ================================
   build_and_push:
     name: "🔨 Build & Push Docker Image"
     runs-on: ubuntu-latest
-    
     outputs:
       image_tag: ${{ steps.meta.outputs.tags }}
       image_digest: ${{ steps.build.outputs.digest }}
-    
     steps:
-      - name: "📥 Checkout Repository"
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
-
-      - name: "🔐 Login to Docker Hub"
+      - name: "Login to Docker Hub"
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: "🏷️ Extract metadata"
+      - name: "Extract metadata"
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -58,7 +39,6 @@ jobs:
             type=ref,event=branch
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
-
       - name: "🔨 Build and push Docker image"
         id: build
         uses: docker/build-push-action@v5
@@ -68,93 +48,73 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: "✅ Build Success Notification"
+      - name: "Build Success Notification"
         run: |
-          echo "🎉 Docker image built successfully!"
-          echo "📦 Image: ${{ steps.meta.outputs.tags }}"
-          echo "🔗 Digest: ${{ steps.build.outputs.digest }}"
-
-  # ================================
-  # JOB 2: DEPLOY TO EC2
-  # ================================
+          echo "Docker image built successfully!"
+          echo "Image: ${{ steps.meta.outputs.tags }}"
+          echo "Digest: ${{ steps.build.outputs.digest }}"
   deploy_to_ec2:
     name: "🚀 Deploy to EC2"
     needs: build_and_push
     runs-on: ubuntu-latest
-    
     steps:
-      - name: "📥 Checkout Repository"
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
-
-      - name: "🔑 Setup SSH"
+      - name: "Setup SSH"
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: "🔧 Add EC2 to known hosts"
+      - name: "Add EC2 to known hosts"
         run: |
           ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
-
-      - name: "🚀 Deploy to EC2"
+      - name: "Deploy to EC2"
         run: |
-          echo "🔄 Iniciando despliegue en EC2..."
-          
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-            echo "🔄 Conectado a EC2 - Iniciando despliegue..."
-            
-            # Login a Docker Hub en EC2
-            echo "🔐 Login a Docker Hub..."
+          echo "Iniciando despliegue en EC2..."
+          # Select first tag from the build job output (comma-separated)
+          IMAGE_TAGS="${{ needs.build_and_push.outputs.image_tag }}"
+          IFS=',' read -r FIRST_TAG _ <<< "$IMAGE_TAGS"
+          if [ -z "$FIRST_TAG" ] || [ "$FIRST_TAG" = "null" ]; then
+            # fallback to latest
+            FIRST_TAG=latest
+          fi
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/axanet-clientes:${FIRST_TAG}"
+
+          # Use an unquoted heredoc so $IMAGE (runner variable) is expanded into
+          # the remote script before being sent over SSH.
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_PUBLIC_IP }} <<EOF
+            echo "Conectado a EC2 - Iniciando despliegue..."
+            echo "Login a Docker Hub..."
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            
-            # Pull de la imagen más reciente
-            echo "📥 Descargando imagen Docker..."
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/axanet-clientes:latest || true
-            
-            # Detener contenedor anterior si existe
-            echo "🛑 Deteniendo contenedor anterior..."
+            echo "Descargando imagen Docker: ${IMAGE}"
+            docker pull ${IMAGE} || true
+            echo "Deteniendo contenedor anterior..."
             docker stop axanet-app || true
             docker rm axanet-app || true
-            
-            # Ejecutar nuevo contenedor
             echo "🚀 Iniciando nuevo contenedor..."
             docker run -d \
               --name axanet-app \
               --restart unless-stopped \
               -p 80:80 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/axanet-clientes:latest
-            
-            # Limpiar imágenes no utilizadas (opcional)
+              ${IMAGE}
             echo "🧹 Limpiando imágenes no utilizadas..."
             docker image prune -af || true
-            
-            # Verificar que el contenedor esté corriendo
             echo "✅ Verificando estado del contenedor..."
             docker ps | grep axanet-app
-            
             echo "🎉 ¡Despliegue completado exitosamente!"
           EOF
-
       - name: "🔍 Verify Deployment"
         run: |
           echo "🔍 Verificando despliegue..."
-          
-          # Esperar un momento para que el contenedor inicie
           sleep 10
-          
-          # Verificar que el servicio esté respondiendo (si es una app web)
-          # curl -f http://${{ secrets.EC2_PUBLIC_IP }} || echo "⚠️ Servicio no responde en puerto 80"
-          
           echo "✅ Verificación de despliegue completada"
-
-      - name: "📊 Deployment Summary"
+      - name: "Deployment Summary"
         run: |
-          echo "📊 RESUMEN DEL DESPLIEGUE"
+          echo "RESUMEN DEL DESPLIEGUE"
           echo "========================"
-          echo "🖥️  Servidor: ${{ secrets.EC2_PUBLIC_IP }}"
-          echo "👤 Usuario: ${{ secrets.EC2_USER }}"
-          echo "📦 Imagen: ${{ needs.build_and_push.outputs.image_tag }}"
-          echo "🔗 Acceso: http://${{ secrets.EC2_PUBLIC_IP }}"
-          echo "⏰ Fecha: $(date)"
+          echo "Servidor: ${{ secrets.EC2_PUBLIC_IP }}"
+          echo "Usuario: ${{ secrets.EC2_USER }}"
+          echo "Imagen: ${{ needs.build_and_push.outputs.image_tag }}"
+          echo "Acceso: http://${{ secrets.EC2_PUBLIC_IP }}"
+          echo "Fecha: $(date)"
           echo ""
-          echo "🎉 ¡Aplicación Axanet desplegada exitosamente!"
+          echo "¡Aplicación Axanet desplegada exitosamente!"

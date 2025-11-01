@@ -4,10 +4,8 @@ import sys
 import os
 from pathlib import Path
 
-# Agregar la carpeta src al path de Python para importar nuestros módulos
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-# Importar nuestros módulos personalizados
 from axanet.cliente_manager import ClienteManager
 from axanet.excepciones import (
     ClienteNoEncontradoError, 
@@ -76,11 +74,11 @@ class AplicacionAxanet:
             input("Presiona Enter para continuar...")
             os.system('cls')
         except ErrorValidacion as e:
-            print(f"❌ Error de validación: {e}")
+            print(f"Error de validación: {e}")
             input("Presiona Enter para continuar...")
             os.system('cls')
         except Exception as e:
-            print(f"❌ Error inesperado: {e}")
+            print(f"Error inesperado: {e}")
             input("Presiona Enter para continuar...")
             os.system('cls')
 
