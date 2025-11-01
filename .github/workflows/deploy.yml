@@ -26,7 +26,7 @@ jobs:
       - name: "Checkout Repository"
         uses: actions/checkout@v4
       - name: "Login to Docker Hub"
-        #if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
+        if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -55,7 +55,7 @@ jobs:
           echo "Image: ${{ steps.meta.outputs.tags }}"
           echo "Digest: ${{ steps.build.outputs.digest }}"
   deploy_to_ec2:
-    name: "🚀 Deploy to EC2"
+    name: "Deploy to EC2"
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:
@@ -80,7 +80,7 @@ jobs:
             echo "Deteniendo contenedor anterior..."
             docker stop axanet-app || true
             docker rm axanet-app || true
-            echo "🚀 Iniciando nuevo contenedor..."
+            echo "Iniciando nuevo contenedor..."
             docker run -d \
               --name axanet-app \
               --restart unless-stopped \
@@ -88,15 +88,15 @@ jobs:
               ${{ secrets.DOCKERHUB_USERNAME }}/axanet-clientes:latest
             echo "🧹 Limpiando imágenes no utilizadas..."
             docker image prune -af || true
-            echo "✅ Verificando estado del contenedor..."
+            echo "Verificando estado del contenedor..."
             docker ps | grep axanet-app
-            echo "🎉 ¡Despliegue completado exitosamente!"
+            echo "¡Despliegue completado exitosamente!"
           EOF
-      - name: "🔍 Verify Deployment"
+      - name: "Verify Deployment"
         run: |
-          echo "🔍 Verificando despliegue..."
+          echo "Verificando despliegue..."
           sleep 10
-          echo "✅ Verificación de despliegue completada"
+          echo "Verificación de despliegue completada"
       - name: "Deployment Summary"
         run: |
           echo "RESUMEN DEL DESPLIEGUE"
