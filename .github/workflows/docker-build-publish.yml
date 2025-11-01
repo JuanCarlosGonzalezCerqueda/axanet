@@ -50,22 +50,22 @@ jobs:
             ${{ inputs.override_tag && format('ghcr.io/{0}/axanet:{1}', github.repository_owner, inputs.override_tag) }}
 
       - name: Login to Docker Hub (optional)
-        if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
+        #if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push image to Docker Hub (optional)
-        if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/axanet:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/axanet:${{ github.sha }}
+      - #name: Build and push image to Docker Hub (optional)
+        #if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
+        #uses: docker/build-push-action@v4
+        #with:
+        #  context: .
+        #  file: ./Dockerfile
+        #  push: true
+        #  tags: |
+        #    ${{ secrets.DOCKERHUB_USERNAME }}/axanet:latest
+        #    ${{ secrets.DOCKERHUB_USERNAME }}/axanet:${{ github.sha }}
 
       - name: Report success
         run: |
