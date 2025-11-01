@@ -56,16 +56,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - #name: Build and push image to Docker Hub (optional)
+      - name: Build and push image to Docker Hub (optional)
         #if: ${{ secrets.DOCKERHUB_USERNAME && secrets.DOCKERHUB_TOKEN }}
-        #uses: docker/build-push-action@v4
-        #with:
-        #  context: .
-        #  file: ./Dockerfile
-        #  push: true
-        #  tags: |
-        #    ${{ secrets.DOCKERHUB_USERNAME }}/axanet:latest
-        #    ${{ secrets.DOCKERHUB_USERNAME }}/axanet:${{ github.sha }}
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/axanet:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/axanet:${{ github.sha }}
 
       - name: Report success
         run: |
