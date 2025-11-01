@@ -15,7 +15,7 @@ on:
       tag:
         description: 'Optional image tag (overrides automatic tag)'
         required: false
-        default: ''
+        default: 'first'
 
 jobs:
   build-and-push:
